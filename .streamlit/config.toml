@@ -1,0 +1,41 @@
+# Definir [theme.light] E [theme.dark] com a MESMA paleta garante que a cor
+# renderizada e sempre a sua, independente de qual modo (claro/escuro) o
+# navegador/SO do usuario prefere ou de qual o Streamlit decidir aplicar por
+# padrao. Um [theme] sozinho deveria "travar" a configuracao, mas na pratica
+# ha inconsistencias entre versoes -- espelhar nos dois e a forma robusta.
+
+[theme]
+primaryColor = "#f0600c"
+backgroundColor = "#fcfce4"
+secondaryBackgroundColor = "#f0cc90"
+textColor = "#070606"
+
+[theme.sidebar]
+backgroundColor = "#070606"
+textColor = "#fcfce4"
+primaryColor = "#f0600c"
+secondaryBackgroundColor = "#1a1a1a"
+
+[theme.light]
+primaryColor = "#f0600c"
+backgroundColor = "#fcfce4"
+secondaryBackgroundColor = "#f0cc90"
+textColor = "#070606"
+
+[theme.dark]
+primaryColor = "#f0600c"
+backgroundColor = "#fcfce4"
+secondaryBackgroundColor = "#f0cc90"
+textColor = "#070606"
+
+[theme.light.sidebar]
+backgroundColor = "#070606"
+textColor = "#fcfce4"
+primaryColor = "#f0600c"
+secondaryBackgroundColor = "#1a1a1a"
+
+[theme.dark.sidebar]
+backgroundColor = "#070606"
+textColor = "#fcfce4"
+primaryColor = "#f0600c"
+secondaryBackgroundColor = "#1a1a1a"

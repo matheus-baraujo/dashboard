@@ -1,0 +1,8 @@
+pandas
+numpy
+seaborn
+streamlit
+streamlit_authenticator
+plotly
+plotly-express
+requests
