@@ -10,6 +10,7 @@ import streamlit as st
 
 from utils.config import METRICAS_ABSOLUTAS, METRICAS_INFO
 from utils.cores import cores_das_metricas
+from utils.icones import markdown_icone
 
 
 def render_seletor_metricas() -> list[str]:
@@ -25,7 +26,9 @@ def render_seletor_metricas() -> list[str]:
     selecionadas = st.pills(
         "Métricas", options=METRICAS_ABSOLUTAS, selection_mode="multi",
         default=["investimento", "cliques"],
-        format_func=lambda m: f"{METRICAS_INFO[m]['emoji']} {METRICAS_INFO[m]['label']}",
+        format_func=lambda m: (
+            f"{markdown_icone(METRICAS_INFO[m]['icone'])} {METRICAS_INFO[m]['label']}"
+        ),
         label_visibility="collapsed"
     )
     return [m for m in METRICAS_ABSOLUTAS if m in selecionadas]

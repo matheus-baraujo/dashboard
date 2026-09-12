@@ -35,6 +35,14 @@ def _css_fundo() -> str:
 [data-testid="stMain"] {{
     background: transparent !important;
 }}
+
+/* Esta tela não usa sidebar. Esconder o elemento (e não só colapsá-lo pelo
+   initial_sidebar_state) garante que nem a sidebar herdada de uma página
+   autenticada nem o botão que a reabriria sobrevivam aqui. */
+[data-testid="stSidebar"],
+[data-testid="stExpandSidebarButton"] {{
+    display: none !important;
+}}
 .st-key-{_CARD_KEY} {{
     background-color: #070606 !important;
     color: #ffffff !important;
