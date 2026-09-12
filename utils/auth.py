@@ -1,15 +1,11 @@
 """
-utils/auth.py — autenticação simples.
-
-Credenciais, verificação de senha e o guard que as páginas autenticadas
-chamam antes de desenhar qualquer coisa.
+autenticação simples.
 """
 
 import hashlib
 
 import streamlit as st
 
-# Placeholder simples — troque por st.secrets em produção.
 # Usuário: admin / Senha: senha123
 CREDENCIAIS = {
     "admin": hashlib.sha256("senha123".encode()).hexdigest(),

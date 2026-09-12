@@ -2,8 +2,7 @@
 utils/config.py — catálogo de métricas e paleta do app.
 
 A paleta de cores do app inteiro (fundo, sidebar, botões) vive em
-.streamlit/config.toml — é o jeito nativo do Streamlit de aplicar tema, então
-as views não precisam injetar CSS pra isso.
+.streamlit/config.toml
 
 O que fica aqui é o catálogo METRICAS_INFO: rótulo, ícone (arquivo de
 assets/icons/ que ilustra a pill da métrica) e a cor correspondente, usada

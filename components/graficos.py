@@ -6,10 +6,11 @@ razão (CTR, CPC, CPA, ROAS) não significa nada — essas viram cards.
 """
 
 import pandas as pd
+import plotly.express as px
 import streamlit as st
 
-from utils.config import METRICAS_ABSOLUTAS, METRICAS_INFO
-from utils.cores import cores_das_metricas
+from utils.config import CORES_METRICAS_LABEL, METRICAS_ABSOLUTAS, METRICAS_INFO, SUNSET
+from utils.cores import cor_para_streamlit, cores_das_metricas
 from utils.icones import markdown_icone
 
 
@@ -59,6 +60,17 @@ def render_graficos(df_f: pd.DataFrame) -> None:
             # 3. Renderiza com cor fixa por métrica
             st.line_chart(df_tempo, color=cores)
 
+        with st.container(border=True):
+            st.caption("Segmentação por público")
+
+            df_seg = (
+                df_f["segmento_publico"]
+                .value_counts()
+                .rename("Quantidade")
+                .to_frame()
+            )
+            st.bar_chart(df_seg, color=cor_para_streamlit(SUNSET[3]))
+
     with col2:
         with st.container(border=True):
             st.caption("Comparativo por campanha")
@@ -69,10 +81,33 @@ def render_graficos(df_f: pd.DataFrame) -> None:
             # 2. Renomeia as colunas usando o dicionário de labels
             df_camp = df_camp.rename(columns=lambda m: METRICAS_INFO[m]["label"])
 
-            # 3. Renderiza com cor fixa por métrica
-            st.bar_chart(
-                df_camp,
-                horizontal=False,  # Exibe na horizontal
-                stack=False,      # Define se é agrupado (False) ou empilhado (True)
-                color=cores,
+            # st.bar_chart (Vega) corta labels longos mesmo na horizontal.
+            # Plotly já está no projeto e o automargin mostra o nome inteiro.
+            df_plot = (
+                df_camp.reset_index()
+                .melt(id_vars="campanha_nome", var_name="Métrica", value_name="Valor")
             )
+            fig = px.bar(
+                df_plot,
+                x="Valor",
+                y="campanha_nome",
+                color="Métrica",
+                barmode="group",
+                orientation="h",
+                color_discrete_map={
+                    col: CORES_METRICAS_LABEL[col] for col in df_camp.columns
+                },
+                category_orders={"campanha_nome": list(df_camp.index)},
+            )
+            fig.update_layout(
+                xaxis_title=None,
+                yaxis_title=None,
+                height=560,
+                margin=dict(l=20, r=10, t=10, b=40),
+                legend=dict(orientation="h", yanchor="bottom", y=-0.18, title=None),
+                plot_bgcolor="rgba(0,0,0,0)",
+                paper_bgcolor="rgba(0,0,0,0)",
+            )
+            fig.update_yaxes(automargin=True)
+            fig.update_xaxes(showgrid=True, gridcolor="rgba(0,0,0,0.08)", zeroline=False)
+            st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
