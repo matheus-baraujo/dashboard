@@ -2,7 +2,8 @@ pandas
 numpy
 seaborn
 streamlit
-streamlit_authenticator
+PyJWT
+streamlit-cookies-controller
 plotly
 plotly-express
 requests

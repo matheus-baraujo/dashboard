@@ -2,10 +2,12 @@
 
 import streamlit as st
 
+from utils.auth import restaurar_sessao
 from views import dashboard, data_management, login, summary
 
 st.set_page_config(page_title="Dashboard Tráfego Pago", page_icon="assets/favicon.ico", layout="wide")
 
+restaurar_sessao()
 autenticado = bool(st.session_state.get("autenticado"))
 
 # Só no login/logout: senão a sidebar reabre a cada rerun.

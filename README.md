@@ -16,7 +16,7 @@ pip install -r requirements.txt
 streamlit run app.py
 ```
 
-Dependências usadas pelo app: `streamlit`, `pandas`, `plotly`, `requests`. O gerador do CSV de exemplo também usa `numpy`.
+Dependências usadas pelo app: `streamlit`, `pandas`, `plotly`, `requests`, `PyJWT`, `streamlit-cookies-controller`. O gerador do CSV de exemplo também usa `numpy`.
 
 ## Login de demonstração
 
@@ -24,7 +24,7 @@ Dependências usadas pelo app: `streamlit`, `pandas`, `plotly`, `requests`. O ge
 | ------- | -------- |
 | `admin` | `senha123` |
 
-As credenciais estão em `utils/auth.py`.
+As credenciais estão em `utils/auth.py`. Após o login, a sessão fica em um cookie JWT (7 dias) e sobrevive ao reload da página. Em produção, defina a variável de ambiente `AUTH_SECRET`.
 
 ## Fontes de dados
 

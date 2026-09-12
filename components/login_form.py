@@ -5,7 +5,7 @@ from pathlib import Path
 
 import streamlit as st
 
-from utils.auth import verificar_login
+from utils.auth import fazer_login, verificar_login
 
 _FUNDO = Path(__file__).resolve().parent.parent / "assets" / "bg_app.svg"
 _CARD_KEY = "login_card"
@@ -81,8 +81,7 @@ def render_form() -> None:
 
         if enviado:
             if verificar_login(usuario, senha):
-                st.session_state["autenticado"] = True
-                st.session_state["usuario"] = usuario
+                fazer_login(usuario)
                 st.rerun()
             else:
                 st.error("Usuário ou senha inválidos.")

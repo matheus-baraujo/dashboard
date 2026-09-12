@@ -3,6 +3,8 @@
 import pandas as pd
 import streamlit as st
 
+from utils.auth import fazer_logout
+
 CHAVE_CANAIS = "filtro_canais"
 CHAVE_PERIODO = "filtro_periodo"
 CHAVE_CAMPANHAS = "filtro_campanhas"
@@ -13,7 +15,7 @@ CHAVE_OBJETIVOS = "filtro_objetivos"
 def render_topo() -> None:
     st.sidebar.caption(f"Bem-vindo, {st.session_state.get('usuario', '')}")
     if st.sidebar.button("Sair", width="stretch"):
-        st.session_state["autenticado"] = False
+        fazer_logout()
         st.rerun()
 
 
