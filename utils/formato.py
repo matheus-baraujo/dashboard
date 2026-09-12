@@ -1,9 +1,4 @@
-"""
-utils/formato.py — formatação dos números exibidos no app.
-
-Padrão brasileiro (milhar com ponto, decimal com vírgula) e a unidade certa
-para cada métrica derivada. Derivada sem valor (denominador zero) vira "—".
-"""
+"""Formatação dos números exibidos no app."""
 
 from utils.config import METRICAS_INFO
 
@@ -19,7 +14,7 @@ def formatar_reais(valor: float) -> str:
 
 
 def formatar_derivada(chave: str, valor: float | None) -> str:
-    """Cada derivada tem sua unidade: CTR em %, CPC/CPA em reais, ROAS em x."""
+    """CTR em %, CPC/CPA em reais, ROAS em x. Sem valor vira '—'."""
     if valor is None:
         return "—"
     if chave == "ctr":

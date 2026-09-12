@@ -1,26 +1,8 @@
-"""
-utils/metricas.py — cálculo das métricas do app.
-
-CTR, CPC, CPA e ROAS são razões. Somar as colunas do dataset (uma linha =
-uma campanha, num dia, num dispositivo) não significa nada, e tirar a média
-das razões daria peso igual a dias muito diferentes entre si. O certo é
-recalcular a razão a partir das somas do período — é o que calcular_derivadas
-faz, e é a única fonte desses números no app.
-
-Denominador zero devolve None (ex.: CPA de uma campanha de tráfego, que não
-tem conversão). Quem exibe decide o que fazer com isso — formatar_derivada
-mostra "—".
-
-calcular_resumo agrega os indicadores da página Resumo em cima das mesmas
-derivadas, pra que os dois lugares nunca mostrem números diferentes.
-"""
+"""Cálculo das métricas do app."""
 
 import pandas as pd
 
 
-# ============================================================================
-# DERIVADAS
-# ============================================================================
 def _razao(numerador: float, denominador: float) -> float | None:
     if not denominador or pd.isna(denominador):
         return None
@@ -49,16 +31,12 @@ def calcular_derivadas(df: pd.DataFrame) -> dict[str, float | None]:
 
 
 def variacao_percentual(atual: float | None, anterior: float | None) -> float | None:
-    """Variação relativa entre dois valores, em %. None quando não há base
-    de comparação (sem período anterior ou valor anterior zerado)."""
+    """Variação relativa entre dois valores, em %. None quando não há base."""
     if atual is None or anterior is None or not anterior:
         return None
     return (atual - anterior) / anterior * 100
 
 
-# ============================================================================
-# RESUMO
-# ============================================================================
 def _divide(numerador: float, denominador: float) -> float:
     return numerador / denominador if denominador else 0.0
 

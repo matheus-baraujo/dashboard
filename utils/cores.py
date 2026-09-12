@@ -1,21 +1,10 @@
-"""
-utils/cores.py — ponte entre a paleta do Plotly e os gráficos nativos.
-
-As cores de utils/config.py vêm do Plotly como string "rgb(r, g, b)", que os
-gráficos nativos do Streamlit não entendem. Aqui elas são convertidas.
-"""
+"""Conversão de cores do Plotly para gráficos nativos do Streamlit."""
 
 from utils.config import METRICAS_INFO
 
 
 def cor_para_streamlit(cor: str) -> str | tuple:
-    """Converte uma cor da paleta para um formato que st.line_chart e
-    st.bar_chart aceitam.
-
-    O parâmetro `color` desses gráficos só entende hex ("#rrggbb") ou tupla
-    RGB de inteiros — não aceita a string "rgb(...)" que o Plotly usa. Cores
-    já em hex (ex: se METRICAS_INFO for alterado no futuro) passam direto.
-    """
+    """Converte rgb(...) do Plotly para hex ou tupla RGB que o Streamlit aceita."""
     if cor.startswith("#"):
         return cor
     if cor.startswith("rgb"):
@@ -26,6 +15,5 @@ def cor_para_streamlit(cor: str) -> str | tuple:
 
 
 def cores_das_metricas(metricas: list[str]) -> list:
-    """Cores na mesma ordem das métricas recebidas — é assim que o parâmetro
-    `color` dos gráficos nativos casa cor com coluna."""
+    """Cores na mesma ordem das métricas recebidas."""
     return [cor_para_streamlit(METRICAS_INFO[m]["cor"]) for m in metricas]

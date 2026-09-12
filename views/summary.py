@@ -1,10 +1,4 @@
-"""
-views/summary.py — Resumo.
-
-Só cards, nenhum gráfico. Usa os mesmos filtros da sidebar do dashboard
-(components/sidebar.py), então os números daqui batem com o que o dashboard
-mostra: ambos saem de utils/metricas.py.
-"""
+"""Página de resumo: cards de totais e destaques."""
 
 import streamlit as st
 

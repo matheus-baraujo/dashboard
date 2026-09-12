@@ -1,12 +1,9 @@
-"""
-autenticação simples.
-"""
+"""Autenticação simples."""
 
 import hashlib
 
 import streamlit as st
 
-# Usuário: admin / Senha: senha123
 CREDENCIAIS = {
     "admin": hashlib.sha256("senha123".encode()).hexdigest(),
 }

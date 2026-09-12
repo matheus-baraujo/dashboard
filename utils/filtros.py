@@ -1,13 +1,4 @@
-"""
-utils/filtros.py — aplicação dos filtros no DataFrame.
-
-Só pandas: quem desenha os widgets é components/sidebar.py, que devolve o
-dicionário de filtros consumido aqui.
-
-Categoria e data são aplicadas separadamente porque o dashboard precisa
-comparar a janela escolhida com a anterior — e as linhas da janela anterior
-estão justamente fora do filtro de data.
-"""
+"""Aplicação dos filtros no DataFrame."""
 
 from datetime import date, timedelta
 
@@ -34,8 +25,7 @@ def aplicar_janela(df: pd.DataFrame, inicio: date, fim: date) -> pd.DataFrame:
 
 
 def janela_selecionada(filtros: dict) -> tuple[date, date] | None:
-    """O st.date_input de range devolve uma data só enquanto o usuário está no
-    meio da escolha; nesse caso não há janela definida ainda."""
+    """st.date_input de range pode devolver uma data só no meio da escolha."""
     periodo = filtros["periodo"]
     if len(periodo) != 2:
         return None
@@ -60,14 +50,7 @@ def aplicar_filtros(df: pd.DataFrame, filtros: dict) -> pd.DataFrame:
 
 
 def janelas_comparadas(df_bruto: pd.DataFrame, filtros: dict):
-    """Retorna (df da janela selecionada, df da janela anterior, janela
-    anterior). A anterior vem do dataset com só os filtros de categoria
-    aplicados — as linhas dela estão fora do filtro de data.
-
-    A comparação é descartada quando a janela anterior começaria antes do
-    início do dataset: comparar 30 dias com os 10 que existem enganaria mais
-    do que informaria.
-    """
+    """Retorna (df selecionado, df anterior, janela anterior). Descarta se incompleta."""
     df_cat = aplicar_filtros_categoricos(df_bruto, filtros)
     janela = janela_selecionada(filtros)
 

@@ -1,9 +1,4 @@
-"""
-components/login_form.py — fundo e card de login.
-
-O card é nativo (st.container). O fundo da página usa CSS injetado porque
-o Streamlit não permite background diferente por página no tema.
-"""
+"""Fundo e card de login."""
 
 import base64
 from pathlib import Path
@@ -13,9 +8,6 @@ import streamlit as st
 from utils.auth import verificar_login
 
 _FUNDO = Path(__file__).resolve().parent.parent / "assets" / "bg_app.svg"
-
-# O key do container vira a classe CSS .st-key-<key>, que é o jeito suportado
-# de mirar um container específico sem depender de classe interna do Streamlit.
 _CARD_KEY = "login_card"
 
 
@@ -36,9 +28,7 @@ def _css_fundo() -> str:
     background: transparent !important;
 }}
 
-/* Esta tela não usa sidebar. Esconder o elemento (e não só colapsá-lo pelo
-   initial_sidebar_state) garante que nem a sidebar herdada de uma página
-   autenticada nem o botão que a reabriria sobrevivam aqui. */
+/* Esta tela não usa sidebar: esconde o painel e o botão de reabrir. */
 [data-testid="stSidebar"],
 [data-testid="stExpandSidebarButton"] {{
     display: none !important;

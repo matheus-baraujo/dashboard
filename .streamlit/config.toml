@@ -1,8 +1,4 @@
-# Definir [theme.light] E [theme.dark] com a MESMA paleta garante que a cor
-# renderizada e sempre a sua, independente de qual modo (claro/escuro) o
-# navegador/SO do usuario prefere ou de qual o Streamlit decidir aplicar por
-# padrao. Um [theme] sozinho deveria "travar" a configuracao, mas na pratica
-# ha inconsistencias entre versoes -- espelhar nos dois e a forma robusta.
+# Light e dark usam a mesma paleta de propósito.
 
 [theme]
 primaryColor = "#f0600c"

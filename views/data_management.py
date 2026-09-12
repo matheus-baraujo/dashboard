@@ -1,10 +1,4 @@
-"""
-views/data_management.py — Gestão de dados.
-
-Página dedicada a upload e conferência do dataset. Sem filtros, sem gráficos
-e sem cards: só o envio do CSV e a prévia da tabela, ambos em
-components/dataset.py.
-"""
+"""Página de upload e prévia do dataset."""
 
 import streamlit as st
 

@@ -1,14 +1,4 @@
-"""
-views/dashboard.py — Dashboard de Tráfego Pago.
-
-A página só orquestra: guard de login, dados, filtros e a ordem dos blocos.
-Cada bloco é um componente (components/graficos.py, components/cards.py) e o
-cálculo fica em utils/.
-
-Os gráficos mostram só métricas absolutas (soma faz sentido). CTR, CPC, CPA e
-ROAS são razões: viraram cards, com a variação em relação ao período anterior
-de mesmo tamanho.
-"""
+"""Página do dashboard: gráficos e insights."""
 
 import streamlit as st
 

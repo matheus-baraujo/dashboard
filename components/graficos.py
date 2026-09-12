@@ -1,9 +1,4 @@
-"""
-components/graficos.py — seletor de métricas e os gráficos do Dashboard.
-
-Só métricas absolutas aparecem aqui: os gráficos agregam com soma, e somar
-razão (CTR, CPC, CPA, ROAS) não significa nada — essas viram cards.
-"""
+"""Seletor de métricas e gráficos do Dashboard."""
 
 import pandas as pd
 import plotly.express as px
@@ -15,15 +10,7 @@ from utils.icones import markdown_icone
 
 
 def render_seletor_metricas() -> list[str]:
-    """Pills de métricas. Devolve a seleção na ordem fixa do catálogo.
-
-    st.line_chart/st.bar_chart não têm color_discrete_map: o parâmetro
-    `color` deles é posicional (lista alinhada à ordem das colunas do
-    DataFrame). Por isso a métrica precisa estar numa ordem fixa e
-    previsível (a ordem do catálogo METRICAS_ABSOLUTAS) em vez da ordem em
-    que o usuário clicou nos pills — senão a cor "anda" quando a seleção
-    muda, mesmo que a métrica continue sendo a mesma.
-    """
+    """Pills de métricas. Devolve a seleção na ordem fixa do catálogo."""
     selecionadas = st.pills(
         "Métricas", options=METRICAS_ABSOLUTAS, selection_mode="multi",
         default=["investimento", "cliques"],
@@ -52,10 +39,7 @@ def render_graficos(df_f: pd.DataFrame) -> None:
         with st.container(border=True):
             st.subheader("Desempenho ao longo do tempo")
 
-            # 1. Agrupa por data (ordem de colunas = ordem de `metricas`)
             df_tempo = df_f.groupby("data")[metricas].sum()
-
-            # 2. Renomeia as colunas usando o dicionário de labels
             df_tempo = df_tempo.rename(columns=lambda m: METRICAS_INFO[m]["label"])
 
             df_tempo_plot = (
@@ -113,14 +97,10 @@ def render_graficos(df_f: pd.DataFrame) -> None:
         with st.container(border=True):
             st.subheader("Comparativo por campanha")
 
-            # 1. Agrupa pelas métricas selecionadas (mesma ordem fixa)
             df_camp = df_f.groupby("campanha_nome")[metricas].sum()
-
-            # 2. Renomeia as colunas usando o dicionário de labels
             df_camp = df_camp.rename(columns=lambda m: METRICAS_INFO[m]["label"])
 
-            # st.bar_chart (Vega) corta labels longos mesmo na horizontal.
-            # Plotly já está no projeto e o automargin mostra o nome inteiro.
+            # Plotly (não Vega): labels longos de campanha não são cortados.
             df_plot = (
                 df_camp.reset_index()
                 .melt(id_vars="campanha_nome", var_name="Métrica", value_name="Valor")

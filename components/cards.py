@@ -1,15 +1,4 @@
-"""
-components/cards.py — cards de KPI.
-
-Reúne o estilo dos cards, o card genérico e as duas composições que as
-páginas usam: as derivadas com variação (Dashboard) e o painel de indicadores
-(Resumo). As duas passam pelo mesmo render_card, então badge, métrica e notas
-se parecem em qualquer página.
-
-O key do container vira a classe .st-key-<key>, que é o jeito suportado de
-mirar um container específico. Os cards usam o prefixo PREFIXO_CARD + a cor
-do badge, então um seletor por prefixo pega todos e um por cor pinta cada um.
-"""
+"""Cards de KPI do Dashboard e do Resumo."""
 
 import pandas as pd
 import streamlit as st
@@ -24,8 +13,6 @@ from utils.metricas import calcular_derivadas, variacao_percentual
 
 PREFIXO_CARD = "kpi_card"
 
-# Tons claros das cores de badge do Streamlit: destacam o card sem competir
-# com o número, que é o que precisa ser lido primeiro.
 FUNDOS_CARD = {
     "green":  "#edf7ed",
     "blue":   "#e8f1fb",
@@ -37,22 +24,13 @@ FUNDOS_CARD = {
 }
 
 
-# ============================================================================
-# ESTILO
-# ============================================================================
 def chave_card(cor: str, nome: str) -> str:
     """Key do container de um card. Precisa ser única na página."""
     return f"{PREFIXO_CARD}_{cor}_{nome}"
 
 
 def aplicar_estilo() -> None:
-    """Injeta o CSS dos cards de KPI (fundo, sombra e quebra de linha).
-
-    st.metric renderiza label e valor com nowrap + ellipsis: texto grande
-    demais some no "...". Nos cards isso atrapalha a leitura, então aqui a
-    quebra de linha é liberada e a fonte do valor cai um pouco, pra um valor
-    de duas linhas não esticar a altura da linha de cards.
-    """
+    """Injeta o CSS dos cards de KPI (fundo, sombra e quebra de linha)."""
     regras_cor = "\n".join(
         f'[class*="st-key-{PREFIXO_CARD}_{cor}_"] {{ background-color: {fundo}; }}'
         for cor, fundo in FUNDOS_CARD.items()
@@ -86,9 +64,6 @@ def aplicar_estilo() -> None:
     )
 
 
-# ============================================================================
-# CARD GENÉRICO
-# ============================================================================
 def render_card(
     nome: str,
     badge: str,
@@ -112,12 +87,7 @@ def render_card(
             st.caption(nota)
 
 
-# ============================================================================
-# DASHBOARD: MÉTRICAS DERIVADAS
-# ============================================================================
-
-# Um card por métrica derivada. "inverse" inverte a cor do delta: em custo
-# (CPC, CPA), subir é ruim.
+# "inverse" inverte a cor do delta: em custo (CPC, CPA), subir é ruim.
 CARDS_DERIVADAS = [
     ("ctr",  "Tráfego", "blue",   "normal",  "cliques / impressões"),
     ("cpc",  "Custo",   "orange", "inverse", "investimento / cliques"),
@@ -162,9 +132,6 @@ def render_derivadas(df_f: pd.DataFrame, df_anterior, janela_anterior) -> None:
             )
 
 
-# ============================================================================
-# RESUMO: PAINEL DE INDICADORES
-# ============================================================================
 def render_resumo(resumo: dict) -> None:
     col1, col2, col3 = st.columns(3)
 
@@ -210,8 +177,7 @@ def render_resumo(resumo: dict) -> None:
             ),
         )
 
-    # O nome da campanha vai pra caption: como valor do st.metric ele é longo
-    # demais e viraria "...", escondendo justamente o que interessa.
+    # Nome da campanha vai para caption: como valor do metric ficaria cortado.
     with col5:
         render_card(
             "destaque", "Destaque", "yellow", "Melhor ROAS",

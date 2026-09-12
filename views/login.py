@@ -1,9 +1,4 @@
-"""
-views/login.py — Tela de login.
-
-A página posiciona o card no centro; o fundo, o formulário e a autenticação
-ficam em components/login_form.py.
-"""
+"""Página de login."""
 
 import streamlit as st
 

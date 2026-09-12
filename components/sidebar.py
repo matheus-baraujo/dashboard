@@ -1,13 +1,4 @@
-"""
-components/sidebar.py — topo e filtros da sidebar.
-
-O topo traz as boas-vindas e o botão de sair; os filtros são os mesmos em
-todas as páginas autenticadas. Os widgets usam key explícita: assim o valor
-escolhido vive no session_state e continua o mesmo quando o usuário troca
-entre Dashboard e Resumo.
-
-Aqui só mora a UI — aplicar o filtro no DataFrame é com utils/filtros.py.
-"""
+"""Topo e filtros da sidebar."""
 
 import pandas as pd
 import streamlit as st
@@ -19,9 +10,6 @@ CHAVE_DISPOSITIVOS = "filtro_dispositivos"
 CHAVE_OBJETIVOS = "filtro_objetivos"
 
 
-# ============================================================================
-# TOPO
-# ============================================================================
 def render_topo() -> None:
     st.sidebar.caption(f"Bem-vindo, {st.session_state.get('usuario', '')}")
     if st.sidebar.button("Sair", width="stretch"):
@@ -29,13 +17,8 @@ def render_topo() -> None:
         st.rerun()
 
 
-# ============================================================================
-# FILTROS
-# ============================================================================
 def _select_com_opcao_todos(label: str, opcoes: list, chave: str) -> list:
-    """Selectbox simples com uma opção extra 'Todos' no topo. Retorna a lista
-    de valores que o filtro deve considerar (todas as opções, se 'Todos'
-    estiver selecionado, ou só a opção escolhida)."""
+    """Selectbox com 'Todos' no topo. Retorna a lista de valores do filtro."""
     todas = ["Todos"] + opcoes
 
     # Dataset novo pode não ter mais a opção guardada de um dataset anterior.

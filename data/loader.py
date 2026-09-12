@@ -1,13 +1,4 @@
-"""
-data/loader.py — carregamento e persistência do dataset.
-
-Toda leitura de dados do app passa por aqui: upload, API e CSV de exemplo.
-O upload acontece na página Gestão de dados, e um widget é desmontado quando
-sai da tela — por isso o DataFrame lido do CSV fica guardado no session_state,
-e não no próprio st.file_uploader.
-
-Prioridade de origem: upload > API > CSV de exemplo local.
-"""
+"""Carregamento e persistência do dataset."""
 
 from pathlib import Path
 
@@ -18,7 +9,6 @@ import streamlit as st
 API_URL = "http://localhost:8000/dados"
 CSV_LOCAL = Path(__file__).resolve().parent / "dataset_trafego_pago.csv"
 
-# Chaves de session_state usadas pra guardar o upload entre páginas.
 CHAVE_DF_UPLOAD = "df_upload"
 CHAVE_NOME_UPLOAD = "nome_upload"
 
@@ -29,9 +19,6 @@ LABEL_FONTE = {
 }
 
 
-# ============================================================================
-# ORIGENS
-# ============================================================================
 @st.cache_data(ttl=300, show_spinner="Carregando dados da API...")
 def _carregar_da_api(url: str) -> pd.DataFrame | None:
     try:
@@ -53,9 +40,6 @@ def _carregar_csv_local(caminho: str) -> pd.DataFrame | None:
         return None
 
 
-# ============================================================================
-# UPLOAD (persistido no session_state)
-# ============================================================================
 def registrar_upload(arquivo) -> None:
     """Lê o CSV enviado e guarda o DataFrame no session_state."""
     st.session_state[CHAVE_DF_UPLOAD] = pd.read_csv(arquivo, parse_dates=["data"])
@@ -71,9 +55,6 @@ def tem_upload() -> bool:
     return CHAVE_DF_UPLOAD in st.session_state
 
 
-# ============================================================================
-# CARREGAMENTO
-# ============================================================================
 def carregar_dados() -> tuple[pd.DataFrame | None, str | None]:
     """Retorna (dataframe, fonte). Fonte é 'upload', 'api' ou 'local'."""
     if tem_upload():

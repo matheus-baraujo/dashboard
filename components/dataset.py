@@ -1,9 +1,4 @@
-"""
-components/dataset.py — upload e prévia do dataset (página Gestão de dados).
-
-O upload mora aqui (e não na sidebar) e é guardado no session_state por
-data.loader.registrar_upload, então as outras páginas usam o mesmo dataset.
-"""
+"""Upload e prévia do dataset."""
 
 import streamlit as st
 
