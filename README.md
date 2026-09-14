@@ -2,7 +2,6 @@
 
 Dashboard em Streamlit para acompanhar campanhas de tráfego pago (Google Ads e Meta Ads): gráficos, filtros e indicadores recalculados a partir das somas do período.
 
-
 ## Decisões
 
 - **API** - Queria alcançar um ambiente próximo do real com chamadas de API, não utilizei banco de dados pois já estava encontrando dificiuldades suficientes no uso do Streamlit (principalmente no visual e comportamento das páginas). 
@@ -10,12 +9,16 @@ Dashboard em Streamlit para acompanhar campanhas de tráfego pago (Google Ads e 
 - **Layout e gráficos** - Utilizei alguns gráficos do Plotly (mesmo querendo usar os do Streamlit para exercitar o uso da ferramenta) devido à modificações para melhorar a visualização das labels dos gráficos devido ao tamanho do texto e tamanho dos gráficos.  
 - **Escolha de dataset** - Eu preferi permitir a escolha do dataset na página de dados para evitar problemas de tratamento de dataset, pois eles poderiam conter inconsistências ou duplicatas que poderiam causar problemas na análise.
 
+
+
 ## Páginas
 
 - **Login** — acesso autenticado ao app.
 - **Dashboard** — desempenho ao longo do tempo, segmentação por público, comparativo por campanha e insights (CTR, CPC, CPA, ROAS) com variação em relação ao período anterior de mesmo tamanho.
 - **Gestão de dados** — upload de CSV e prévia da tabela em uso.
 - **Resumo** — cards de totais e destaques (melhor campanha, canal, dispositivo).
+
+
 
 ## Como executar
 
@@ -91,7 +94,7 @@ Uma linha = uma campanha em um dia (e um dispositivo/segmento):
 | `dispositivo`      | `Mobile`, `Desktop` ou `Tablet`                            |
 | `segmento_publico` | Segmento (remarketing, lookalike, etc.)                    |
 | `investimento`     | Valor investido                                            |
-| `impressoes`       | Impressões                                                 |
+| `impressoes`       | Impressões ou Visualizações                                |
 | `cliques`          | Cliques                                                    |
 | `ctr`              | Clique / impressão (no arquivo; o app recalcula)           |
 | `conversoes`       | Conversões                                                 |
