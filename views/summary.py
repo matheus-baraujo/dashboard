@@ -15,7 +15,7 @@ def render():
     cards.aplicar_estilo()
     sidebar.render_topo()
 
-    df_bruto, fonte = loader.carregar_dados()
+    df_bruto, fonte, _ = loader.carregar_dados()
     if df_bruto is None:
         st.error(loader.ERRO_SEM_DADOS)
         st.stop()

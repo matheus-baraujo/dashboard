@@ -1,4 +1,11 @@
-"""Carregamento e persistência do dataset."""
+"""
+data/loader.py — cliente de dados do frontend.
+
+A fonte oficial é a API (GET /dados), que serve um único dataset ativo. Se a
+API cair depois do login, cai no CSV de exemplo local para o dashboard não
+quebrar. Upload, geração, seleção e remoção são operações de admin que também
+falam com a API.
+"""
 
 from pathlib import Path
 
@@ -6,80 +13,105 @@ import pandas as pd
 import requests
 import streamlit as st
 
-API_URL = "http://localhost:8000/dados"
-CSV_LOCAL = Path(__file__).resolve().parent / "dataset_trafego_pago.csv"
+from utils import api
 
-CHAVE_DF_UPLOAD = "df_upload"
-CHAVE_NOME_UPLOAD = "nome_upload"
+CSV_LOCAL = Path(__file__).resolve().parent / "dataset_trafego_pago.csv"
 
 LABEL_FONTE = {
     "upload": "Dataset enviado por upload",
-    "api": "Dataset vindo da API",
-    "local": "CSV de exemplo local (API indisponível)",
+    "gerado": "Dataset gerado",
+    "local": "CSV de exemplo",
 }
 
+ERRO_SEM_DADOS = (
+    "Nenhum dataset disponível. Na página **Gestão de dados**, envie um CSV "
+    "ou gere um dataset de exemplo."
+)
 
-@st.cache_data(ttl=300, show_spinner="Carregando dados da API...")
-def _carregar_da_api(url: str) -> pd.DataFrame | None:
-    try:
-        resp = requests.get(url, timeout=3)
-        resp.raise_for_status()
-    except requests.exceptions.RequestException:
-        return None
 
-    df = pd.DataFrame(resp.json())
-    df["data"] = pd.to_datetime(df["data"])
+def _df_de_registros(registros: list[dict]) -> pd.DataFrame:
+    df = pd.DataFrame(registros)
+    if not df.empty:
+        df["data"] = pd.to_datetime(df["data"])
     return df
 
 
-@st.cache_data(show_spinner=False)
-def _carregar_csv_local(caminho: str) -> pd.DataFrame | None:
+@st.cache_data(ttl=60, show_spinner=False)
+def _carregar_local() -> pd.DataFrame | None:
     try:
-        return pd.read_csv(caminho, parse_dates=["data"])
+        return pd.read_csv(CSV_LOCAL, parse_dates=["data"])
     except FileNotFoundError:
         return None
 
 
-def registrar_upload(arquivo) -> None:
-    """Lê o CSV enviado e guarda o DataFrame no session_state."""
-    st.session_state[CHAVE_DF_UPLOAD] = pd.read_csv(arquivo, parse_dates=["data"])
-    st.session_state[CHAVE_NOME_UPLOAD] = arquivo.name
+def carregar_dados() -> tuple[pd.DataFrame | None, str | None, str | None]:
+    """(df, fonte, nome). Tenta a API; cai no CSV local se ela estiver fora."""
+    try:
+        resp = api.get("/dados")
+    except requests.exceptions.RequestException:
+        resp = None
 
+    if resp is not None and resp.status_code == 200:
+        envelope = resp.json()
+        df = _df_de_registros(envelope["registros"])
+        return df, envelope["fonte"], envelope["nome"]
 
-def limpar_upload() -> None:
-    st.session_state.pop(CHAVE_DF_UPLOAD, None)
-    st.session_state.pop(CHAVE_NOME_UPLOAD, None)
-
-
-def tem_upload() -> bool:
-    return CHAVE_DF_UPLOAD in st.session_state
-
-
-def carregar_dados() -> tuple[pd.DataFrame | None, str | None]:
-    """Retorna (dataframe, fonte). Fonte é 'upload', 'api' ou 'local'."""
-    if tem_upload():
-        return st.session_state[CHAVE_DF_UPLOAD].copy(), "upload"
-
-    df_api = _carregar_da_api(API_URL)
-    if df_api is not None:
-        return df_api.copy(), "api"
-
-    df_local = _carregar_csv_local(str(CSV_LOCAL))
+    # API fora (mas sessão ainda válida): CSV de exemplo como rede de segurança.
+    df_local = _carregar_local()
     if df_local is not None:
-        return df_local.copy(), "local"
+        return df_local.copy(), "local", CSV_LOCAL.name
 
-    return None, None
-
-
-def descricao_fonte(fonte: str | None) -> str:
-    if fonte == "upload":
-        nome = st.session_state.get(CHAVE_NOME_UPLOAD, "arquivo enviado")
-        return f"{LABEL_FONTE['upload']}: {nome}"
-    return LABEL_FONTE.get(fonte, "Nenhum dataset carregado")
+    return None, None, None
 
 
-ERRO_SEM_DADOS = (
-    "Nenhum dataset disponível. Envie um CSV na página **Gestão de dados**, "
-    f"ou suba a API em {API_URL}, ou gere o CSV de exemplo com "
-    "data/gerar_dataset_trafego_pago.py."
-)
+# ============================================================================
+# Operações de admin (catálogo)
+# ============================================================================
+def listar_catalogo() -> dict | None:
+    try:
+        resp = api.get("/dados/catalogo")
+    except requests.exceptions.RequestException:
+        return None
+    return resp.json() if resp.status_code == 200 else None
+
+
+def enviar_arquivos(arquivos) -> dict | None:
+    """Envia os CSVs (UploadedFile do st.file_uploader). Retorna o resumo
+    {aceitos, erros} ou None se a API estiver fora."""
+    multipart = [("arquivos", (a.name, a.getvalue(), "text/csv")) for a in arquivos]
+    try:
+        resp = api.post("/dados", files=multipart)
+    except requests.exceptions.RequestException:
+        return None
+    return resp.json() if resp.status_code == 200 else None
+
+
+def ativar_dataset(id_arquivo: str) -> bool:
+    try:
+        resp = api.put("/dados/ativo", json={"id": id_arquivo})
+    except requests.exceptions.RequestException:
+        return False
+    return resp.status_code == 200
+
+
+def remover_dataset(id_arquivo: str) -> bool:
+    try:
+        resp = api.delete(f"/dados/{id_arquivo}")
+    except requests.exceptions.RequestException:
+        return False
+    return resp.status_code == 200
+
+
+def gerar_dataset() -> dict | None:
+    try:
+        resp = api.post("/dados/gerar")
+    except requests.exceptions.RequestException:
+        return None
+    return resp.json() if resp.status_code == 200 else None
+
+
+def descricao_fonte(fonte: str | None, nome: str | None = None) -> str:
+    base = LABEL_FONTE.get(fonte, "Nenhum dataset carregado")
+    if nome and fonte in ("upload", "gerado"):
+        return f"{base}: {nome}"
+    return base

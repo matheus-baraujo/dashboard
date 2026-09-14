@@ -1,16 +1,20 @@
-"""Autenticação simples com sessão persistida em JWT."""
+"""
+utils/auth.py — sessão do frontend.
 
-import hashlib
+Quem valida credenciais e emite o JWT é a API (utils/api.py + api/auth.py).
+Aqui só cuidamos da sessão: guardar o token no session_state, persistir no
+cookie (7 dias) e recompor a sessão a cada reload decodificando o JWT
+localmente com o mesmo AUTH_SECRET — sem bater na API a cada rerun.
+"""
+
 import os
 import time
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta
 
 import jwt
 import streamlit as st
 
-CREDENCIAIS = {
-    "admin": hashlib.sha256("senha123".encode()).hexdigest(),
-}
+from utils import api
 
 COOKIE_NAME = "auth_token"
 COOKIE_KEY = "auth_cookies"
@@ -18,9 +22,16 @@ DIAS_SESSAO = 7
 AUTH_SECRET = os.environ.get("AUTH_SECRET", "dashboard-demo-secret-change-me!")
 
 
-def verificar_login(usuario: str, senha: str) -> bool:
-    hash_informado = hashlib.sha256(senha.encode()).hexdigest()
-    return CREDENCIAIS.get(usuario) == hash_informado
+def autenticar(usuario: str, senha: str) -> dict | None:
+    """Chama a API. Retorna {'token', 'usuario', 'papel'} ou None."""
+    resposta = api.login(usuario, senha)
+    if not resposta:
+        return None
+    return {
+        "token": resposta["access_token"],
+        "usuario": resposta["usuario"],
+        "papel": resposta["papel"],
+    }
 
 
 def exigir_login() -> None:
@@ -30,28 +41,23 @@ def exigir_login() -> None:
         st.stop()
 
 
-def emitir_token(usuario: str) -> str:
-    agora = datetime.now(timezone.utc)
-    return jwt.encode(
-        {
-            "sub": usuario,
-            "iat": agora,
-            "exp": agora + timedelta(days=DIAS_SESSAO),
-        },
-        AUTH_SECRET,
-        algorithm="HS256",
-    )
+def exigir_admin() -> None:
+    """Interrompe a página para quem não for admin (protege o url_path direto)."""
+    exigir_login()
+    if st.session_state.get("papel") != "admin":
+        st.error("Acesso restrito ao administrador.")
+        st.stop()
 
 
-def usuario_do_token(token: str) -> str | None:
+def _dados_do_token(token: str) -> dict | None:
     try:
         payload = jwt.decode(token, AUTH_SECRET, algorithms=["HS256"])
     except jwt.PyJWTError:
         return None
     usuario = payload.get("sub")
-    if not usuario or usuario not in CREDENCIAIS:
+    if not usuario:
         return None
-    return usuario
+    return {"usuario": usuario, "papel": payload.get("papel")}
 
 
 def _cookies():
@@ -92,18 +98,23 @@ def restaurar_sessao() -> None:
     if not token:
         return
 
-    usuario = usuario_do_token(token)
-    if usuario:
+    dados_token = _dados_do_token(token)
+    if dados_token:
         st.session_state["autenticado"] = True
-        st.session_state["usuario"] = usuario
+        st.session_state["usuario"] = dados_token["usuario"]
+        st.session_state["papel"] = dados_token["papel"]
+        st.session_state["token"] = token
 
 
-def fazer_login(usuario: str) -> None:
+def fazer_login(sessao: dict) -> None:
+    """Recebe {'token', 'usuario', 'papel'} e persiste a sessão."""
     st.session_state["autenticado"] = True
-    st.session_state["usuario"] = usuario
+    st.session_state["usuario"] = sessao["usuario"]
+    st.session_state["papel"] = sessao["papel"]
+    st.session_state["token"] = sessao["token"]
     _cookies().set(
         COOKIE_NAME,
-        emitir_token(usuario),
+        sessao["token"],
         max_age=DIAS_SESSAO * 24 * 3600,
         expires=datetime.now() + timedelta(days=DIAS_SESSAO),
         same_site="lax",
@@ -112,7 +123,7 @@ def fazer_login(usuario: str) -> None:
 
 
 def fazer_logout() -> None:
-    st.session_state["autenticado"] = False
-    st.session_state.pop("usuario", None)
+    for chave in ("autenticado", "usuario", "papel", "token"):
+        st.session_state.pop(chave, None)
     _cookies().remove(COOKIE_NAME, same_site="lax")
     time.sleep(0.4)

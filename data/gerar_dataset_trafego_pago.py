@@ -113,8 +113,10 @@ def gerar_dataset(seed: int = SEED) -> pd.DataFrame:
 
 
 if __name__ == "__main__":
+    from pathlib import Path
+
     df = gerar_dataset()
-    saida = "dataset_trafego_pago.csv"
+    saida = Path(__file__).resolve().parent / "dataset_trafego_pago.csv"
     df.to_csv(saida, index=False)
     print(f"Dataset gerado com {len(df)} linhas -> {saida}")
     print(df.head(10).to_string(index=False))

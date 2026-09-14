@@ -97,7 +97,7 @@ CARDS_DERIVADAS = [
 
 
 def render_derivadas(df_f: pd.DataFrame, df_anterior, janela_anterior) -> None:
-    st.subheader("Insights", anchor=False)
+    st.subheader("Destaques", anchor=False)
 
     if df_f.empty:
         st.info("Nenhum dado no filtro atual.")

@@ -13,7 +13,7 @@ def render():
     cards.aplicar_estilo()
     sidebar.render_topo()
 
-    df_bruto, _ = loader.carregar_dados()
+    df_bruto, _, _ = loader.carregar_dados()
     if df_bruto is None:
         st.error(loader.ERRO_SEM_DADOS)
         st.stop()
@@ -22,5 +22,6 @@ def render():
     df_filtrado, df_anterior, janela_anterior = janelas_comparadas(df_bruto, filtros)
 
     st.title("Dashboard de Tráfego Pago", anchor=False)
-    graficos.render_graficos(df_filtrado)
     cards.render_derivadas(df_filtrado, df_anterior, janela_anterior)
+    graficos.render_graficos(df_filtrado)
+    

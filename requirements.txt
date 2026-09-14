@@ -7,3 +7,6 @@ streamlit-cookies-controller
 plotly
 plotly-express
 requests
+fastapi
+uvicorn[standard]
+python-multipart

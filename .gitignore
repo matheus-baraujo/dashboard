@@ -2,3 +2,6 @@ venv/
 .venv/
 
 __pycache__/
+
+data/uploads/
+data/dataset_trafego_pago_*.csv

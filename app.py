@@ -18,18 +18,24 @@ if st.session_state.get("sidebar_sincronizada") != autenticado:
     )
 
 if autenticado:
-    # url_path explícito: as três views se chamam render().
+    # url_path explícito: as views se chamam render().
     paginas = [
         st.Page(
             dashboard.render, title="Dashboard", icon="📊",
             url_path="dashboard", default=True,
         ),
-        st.Page(
-            data_management.render, title="Gestão de dados", icon="📁",
-            url_path="gestao-de-dados",
-        ),
         st.Page(summary.render, title="Resumo", icon="🧾", url_path="resumo"),
     ]
+    # Gestão de dados só aparece para o admin. A view ainda chama exigir_admin()
+    # para bloquear quem tentar o url_path na mão.
+    if st.session_state.get("papel") == "admin":
+        paginas.insert(
+            1,
+            st.Page(
+                data_management.render, title="Gestão de dados", icon="📁",
+                url_path="gestao-de-dados",
+            ),
+        )
     posicao_nav = "sidebar"
 else:
     paginas = [st.Page(login.render, title="Login", icon="🔒")]
